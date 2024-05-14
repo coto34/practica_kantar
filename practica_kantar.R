@@ -29,9 +29,12 @@ data_procesamiento <- function(file_id) {
   # Read the CSV file into a DataFrame
   df <- read_csv("data_actualizar.csv")
   
-  # Update all columns with random values
-  set.seed(123)  # Set a seed for reproducibility
-  df[] <- lapply(df, function(x) runif(length(x)))
+  # Update only numerical columns with random values
+  df_numeric <- df %>% select(where(is.numeric))
+  df_numeric[] <- lapply(df_numeric, function(x) runif(length(x)))
+  
+  # Combine the modified numeric columns back with the original dataframe
+  df %>% mutate(across(where(is.numeric), ~ runif(n())))
   
   # Write the updated DataFrame back to a CSV file
   write_csv(df, "data_actualizar.csv")
@@ -46,4 +49,5 @@ file_id <- args[1]
 
 # Process the data
 data_procesamiento(file_id)
+
 
