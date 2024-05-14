@@ -1,24 +1,37 @@
-#Cargamos las librerias
+install.packages("googledrive") # Instalamos la librería
+
+# Cargamos librerias
 library(dplyr)
 library(readr)
 library(magrittr)
+library(googledrive)
 
-# Definimos la función para cargar el archivo
-process_data <- function(file_path) {
-  # Convertimos el csv a una DF
-  df <- read_csv(file_path)
+# Autenticamos Google drive
+drive_auth(path = "credentials.json")
+
+# Procesamos los datos
+data_procesamiento <- function(file_id) {
+  # Download the CSV file from Google Drive
+  drive_download(as_id(file_id), path = "data_actualizar.csv", overwrite = TRUE)
   
-  # Añadimos nueva columna
-  set.seed(123)  # Fijamos un número arbitrario de randomness
+  # Read the CSV file into a DataFrame
+  df <- read_csv("data_actualizar.csv")
+  
+  # Añadimos una columna con valores aleatorios
+  set.seed(123)  # Seteamos una semilla para reproducir
   df <- df %>% mutate(`Nueva columna` = runif(n()))
   
-  # Guardamos el archivo en un csv
-  write_csv(df, file_path)
+  # Convertimos de nuevo el archivo a csv
+  write_csv(df, "data_actualizar.csv")
+  
+  # Retornamos el archivo CSV a google drive
+  drive_update(as_id(file_id), media = "data_actualizar.csv")
 }
 
-# Obtenemos el archivo de la linea de comandos
+# Obtenemos el ID de los argumentos
 args <- commandArgs(trailingOnly = TRUE)
-file_path <- args[1]
+file_id <- args[1]
 
-# Procesamos la data
-process_data(file_path)
+# Procesamos los datos
+data_procesamiento(file_id)
+
