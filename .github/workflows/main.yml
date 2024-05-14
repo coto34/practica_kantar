@@ -1,9 +1,7 @@
 name: Process CSV with R
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *' # Runs every 5 minutes
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   run-r-script:
