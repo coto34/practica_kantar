@@ -1,4 +1,5 @@
 import sys
+import os
 import dropbox
 import pandas as pd
 import numpy as np
@@ -6,7 +7,8 @@ from io import BytesIO
 
 def process_data(file_path):
     # Authenticate with Dropbox
-    dbx = dropbox.Dropbox(DROPBOX_TOKEN)
+    dropbox_token = os.getenv('DROPBOX_TOKEN')
+    dbx = dropbox.Dropbox(dropbox_token)
 
     # Download the CSV file from Dropbox
     _, res = dbx.files_download(file_path)
@@ -33,5 +35,3 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
-
-
