@@ -1,53 +1,67 @@
-# Ensure necessary libraries are installed
-if (!requireNamespace("googledrive", quietly = TRUE)) {
-  install.packages("googledrive")
-}
-if (!requireNamespace("dplyr", quietly = TRUE)) {
-  install.packages("dplyr")
-}
-if (!requireNamespace("readr", quietly = TRUE)) {
-  install.packages("readr")
-}
-if (!requireNamespace("magrittr", quietly = TRUE)) {
-  install.packages("magrittr")
-}
+# Install necessary packages
+install.packages("httr")
+install.packages("dplyr")
+install.packages("readr")
+install.packages("magrittr")
 
 # Load libraries
+library(httr)
 library(dplyr)
 library(readr)
 library(magrittr)
-library(googledrive)
 
-# Authenticate Google Drive
-drive_auth(path = "credentials.json")
-
-# Process the data
-data_procesamiento <- function(file_id) {
-  # Download the CSV file from Google Drive
-  drive_download(as_id(file_id), path = "data_actualizar.csv", overwrite = TRUE)
+# Define the function to process the data
+process_data <- function(file_path) {
+  # Download the CSV file from Dropbox
+  dropbox_download(file_path, "data_actualizar.csv")
   
   # Read the CSV file into a DataFrame
   df <- read_csv("data_actualizar.csv")
   
-  # Update only numerical columns with random values
-  df_numeric <- df %>% select(where(is.numeric))
-  df_numeric[] <- lapply(df_numeric, function(x) runif(length(x)))
-  
-  # Combine the modified numeric columns back with the original dataframe
-  df %>% mutate(across(where(is.numeric), ~ runif(n())))
+  # Add a new column with random values
+  set.seed(123)  # Set a seed for reproducibility
+  df <- df %>% mutate(`Nueva columna` = runif(n()))
   
   # Write the updated DataFrame back to a CSV file
   write_csv(df, "data_actualizar.csv")
   
-  # Upload the updated CSV back to Google Drive
-  drive_update(as_id(file_id), media = "data_actualizar.csv")
+  # Upload the updated CSV file back to Dropbox
+  dropbox_upload("data_actualizar.csv", file_path)
 }
 
-# Get the file ID from the arguments
+# Function to download a file from Dropbox
+dropbox_download <- function(dropbox_path, local_path) {
+  url <- paste0("https://content.dropboxapi.com/2/files/download")
+  res <- httr::POST(url,
+                    httr::add_headers("Authorization" = paste("Bearer", Sys.getenv("DROPBOX_TOKEN")),
+                                      "Dropbox-API-Arg" = paste0("{\"path\": \"", dropbox_path, "\"}")),
+                    httr::write_disk(local_path, overwrite = TRUE))
+  
+  if (res$status_code != 200) {
+    stop("Failed to download file from Dropbox")
+  }
+}
+
+# Function to upload a file to Dropbox
+dropbox_upload <- function(local_path, dropbox_path) {
+  url <- paste0("https://content.dropboxapi.com/2/files/upload")
+  res <- httr::POST(url,
+                    httr::add_headers("Authorization" = paste("Bearer", Sys.getenv("DROPBOX_TOKEN")),
+                                      "Dropbox-API-Arg" = paste0("{\"path\": \"", dropbox_path, "\", \"mode\": \"overwrite\"}"),
+                                      "Content-Type" = "application/octet-stream"),
+                    body = upload_file(local_path))
+  
+  if (res$status_code != 200) {
+    stop("Failed to upload file to Dropbox")
+  }
+}
+
+# Get the file path from command line arguments
 args <- commandArgs(trailingOnly = TRUE)
-file_id <- args[1]
+file_path <- args[1]
 
 # Process the data
-data_procesamiento(file_id)
+process_data(file_path)
+
 
 
