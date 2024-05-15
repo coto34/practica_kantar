@@ -17,7 +17,7 @@ def process_data(file_path):
     data = res.content
 
     # Read the CSV file into a DataFrame
-    df = pd.read_csv(BytesIO(data))
+    df = pd.read_csv(BytesIO(data), header=0)
 
     # Set random seed for reproducibility
     np.random.seed(123)
@@ -47,6 +47,7 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
+
 
 
 
