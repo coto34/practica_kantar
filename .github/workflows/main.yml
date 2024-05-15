@@ -1,7 +1,11 @@
 name: Process CSV with R
 
 on:
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
+    inputs:
+      file_id:
+        description: 'The path of the CSV file on Dropbox to process'
+        required: true
 
 jobs:
   run-r-script:
@@ -16,11 +20,10 @@ jobs:
 
     - name: Install packages
       run: |
-        R -e 'install.packages(c("dplyr", "readr", "magrittr", "googledrive"))'
+        R -e 'install.packages(c("dplyr", "readr", "magrittr", "httr"))'
 
     - name: Run R script
       env:
-        GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
+        DROPBOX_TOKEN: ${{ secrets.DROPBOX_TOKEN }}
       run: |
-        echo "$GDRIVE_CREDENTIALS" > credentials.json
         Rscript practica_kantar.R ${{ github.event.inputs.file_id }}
