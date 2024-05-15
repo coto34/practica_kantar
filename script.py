@@ -24,7 +24,7 @@ def process_data(file_path):
     df.iloc[0, 1:] = df.iloc[1:, 1:].sum(axis=0)
 
     # Convert the updated DataFrame back to CSV
-    csv_data = df.to_csv(index=False).encode('utf-8')
+    csv_data = df.to_csv(index=False, line_terminator='\n').encode('utf-8')
 
     # Upload the updated CSV file back to Dropbox
     dbx.files_upload(csv_data, file_path, mode=dropbox.files.WriteMode.overwrite)
