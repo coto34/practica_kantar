@@ -23,7 +23,8 @@ def process_data(file_path):
     print(df.head())
 
     # Ensure the DataFrame is read correctly
-    if df.columns[0] != "AÑOS" or df.iloc[1, 0] != "Total Categorías":
+    expected_first_col_value = ["Total Categorías", "Total Categoria"]
+    if df.columns[0] != "AÑOS" or df.iloc[0, 0] not in expected_first_col_value:
         print("Error: CSV structure is not as expected.")
         return
 
@@ -32,16 +33,15 @@ def process_data(file_path):
     
     # Update values below "Total Categorías" with random values between 2,000,000 and 2,600,000
     for col in df.columns[1:]:  # Skip the first column
-        df.loc[2:, col] = np.random.randint(2000000, 2600000, size=len(df) - 2)
+        df.loc[1:, col] = np.random.randint(2000000, 2600000, size=len(df) - 1)
     
     # Recalculate the totals for "Total Categorías"
     for col in df.columns[1:]:  # Skip the first column
-        df.at[1, col] = df[col].iloc[2:].sum()
+        df.at[0, col] = df[col].iloc[1:].sum()
 
     # Ensure the first column and first row remain unchanged
     df.iloc[0, 0] = "AÑOS"
-    df.iloc[1, 0] = "Total Categorías"
-    df.iloc[2:, 0] = ["Marca " + str(i) for i in range(1, len(df) - 1)]
+    df.iloc[1:, 0] = ["Marca " + str(i) for i in range(1, len(df))]
 
     # Convert the updated DataFrame back to CSV with proper encoding
     csv_data = df.to_csv(index=False, encoding='utf-8').encode('utf-8')
