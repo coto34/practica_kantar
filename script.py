@@ -1,8 +1,12 @@
 import sys
+import os
 import dropbox
 import pandas as pd
 import numpy as np
 from io import BytesIO
+
+# Define DROPBOX_TOKEN using the environment variable
+DROPBOX_TOKEN = os.getenv('DROPBOX_TOKEN')
 
 def process_data(file_path):
     # Authenticate with Dropbox
@@ -31,7 +35,6 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
-
 
 
 
