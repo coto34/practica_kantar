@@ -52,10 +52,3 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
-
-
-
-
-
-
-
