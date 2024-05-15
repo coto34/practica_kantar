@@ -19,9 +19,21 @@ def process_data(file_path):
     # Read the CSV file into a DataFrame
     df = pd.read_csv(BytesIO(data))
 
-    # Add a new column with random values
-    np.random.seed(123)  # Set a seed for reproducibility
-    df['Nueva columna'] = np.random.rand(len(df))
+    # Set random seed for reproducibility
+    np.random.seed(123)
+    
+    # Update values below "Total Categorías" with random values between 2,000,000 and 2,600,000
+    for col in df.columns[1:]:  # Skip the first column
+        df.loc[2:, col] = np.random.randint(2000000, 2600000, size=len(df) - 2)
+    
+    # Recalculate the totals for "Total Categorías"
+    for col in df.columns[1:]:  # Skip the first column
+        df.at[1, col] = df[col].iloc[2:].sum()
+
+    # Ensure the first column and first row remain unchanged
+    df.iloc[0, 0] = "AÑOS"
+    df.iloc[1, 0] = "Total Categorías"
+    df.iloc[2:, 0] = ["Marca " + str(i) for i in range(1, len(df) - 1)]
 
     # Convert the updated DataFrame back to CSV
     csv_data = df.to_csv(index=False).encode('utf-8')
@@ -32,6 +44,10 @@ def process_data(file_path):
 if __name__ == '__main__':
     # Get the file path from command line arguments
     file_path = sys.argv[1]
+
+    # Process the data
+    process_data(file_path)
+
 
     # Process the data
     process_data(file_path)
