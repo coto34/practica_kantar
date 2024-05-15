@@ -40,7 +40,7 @@ def process_data(file_path):
         df.at[0, col] = df[col].iloc[1:].sum()
 
     # Ensure the first column and first row remain unchanged
-    df.iloc[0, 0] = "AÑOS"
+    df.iloc[0, 0] = "Total Categorías"
     df.iloc[1:, 0] = ["Marca " + str(i) for i in range(1, len(df))]
 
     # Convert the updated DataFrame back to CSV with proper encoding
@@ -59,3 +59,4 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
+
