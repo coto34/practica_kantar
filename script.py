@@ -19,6 +19,9 @@ def process_data(file_path):
     # Read the CSV file into a DataFrame with proper encoding
     df = pd.read_csv(BytesIO(data), encoding='utf-8', quotechar='"', skipinitialspace=True)
 
+    # Debug: Print the DataFrame to verify its structure
+    print(df.head())
+
     # Ensure the DataFrame is read correctly
     if df.columns[0] != "AÑOS" or df.iloc[1, 0] != "Total Categorías":
         print("Error: CSV structure is not as expected.")
@@ -44,7 +47,11 @@ def process_data(file_path):
     csv_data = df.to_csv(index=False, encoding='utf-8').encode('utf-8')
 
     # Upload the updated CSV file back to Dropbox
-    dbx.files_upload(csv_data, file_path, mode=dropbox.files.WriteMode.overwrite)
+    try:
+        dbx.files_upload(csv_data, file_path, mode=dropbox.files.WriteMode.overwrite)
+        print("File uploaded successfully to Dropbox.")
+    except Exception as e:
+        print(f"Error uploading file to Dropbox: {e}")
 
 if __name__ == '__main__':
     # Get the file path from command line arguments
