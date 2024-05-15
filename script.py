@@ -16,8 +16,8 @@ def process_data(file_path):
     _, res = dbx.files_download(file_path)
     data = res.content
 
-    # Read the CSV file into a DataFrame
-    df = pd.read_csv(BytesIO(data))
+    # Read the CSV file into a DataFrame with proper encoding
+    df = pd.read_csv(BytesIO(data), encoding='utf-8', quotechar='"', skipinitialspace=True)
 
     # Ensure the DataFrame is read correctly
     if df.columns[0] != "AÑOS" or df.iloc[1, 0] != "Total Categorías":
@@ -40,8 +40,8 @@ def process_data(file_path):
     df.iloc[1, 0] = "Total Categorías"
     df.iloc[2:, 0] = ["Marca " + str(i) for i in range(1, len(df) - 1)]
 
-    # Convert the updated DataFrame back to CSV
-    csv_data = df.to_csv(index=False).encode('utf-8')
+    # Convert the updated DataFrame back to CSV with proper encoding
+    csv_data = df.to_csv(index=False, encoding='utf-8').encode('utf-8')
 
     # Upload the updated CSV file back to Dropbox
     dbx.files_upload(csv_data, file_path, mode=dropbox.files.WriteMode.overwrite)
@@ -52,6 +52,7 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
+
 
 
 
