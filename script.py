@@ -17,7 +17,12 @@ def process_data(file_path):
     data = res.content
 
     # Read the CSV file into a DataFrame
-    df = pd.read_csv(BytesIO(data), header=0)
+    df = pd.read_csv(BytesIO(data))
+
+    # Ensure the DataFrame is read correctly
+    if df.columns[0] != "AÑOS" or df.iloc[1, 0] != "Total Categorías":
+        print("Error: CSV structure is not as expected.")
+        return
 
     # Set random seed for reproducibility
     np.random.seed(123)
@@ -47,6 +52,7 @@ if __name__ == '__main__':
 
     # Process the data
     process_data(file_path)
+
 
 
 
