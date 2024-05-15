@@ -1,14 +1,14 @@
-# Install necessary packages
-install.packages("httr")
-install.packages("dplyr")
-install.packages("readr")
-install.packages("magrittr")
+# Ensure necessary packages are installed
+required_packages <- c("dplyr", "readr", "magrittr", "httr")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+
+if(length(new_packages)) install.packages(new_packages)
 
 # Load libraries
-library(httr)
 library(dplyr)
 library(readr)
 library(magrittr)
+library(httr)
 
 # Define the function to process the data
 process_data <- function(file_path) {
@@ -31,7 +31,7 @@ process_data <- function(file_path) {
 
 # Function to download a file from Dropbox
 dropbox_download <- function(dropbox_path, local_path) {
-  url <- paste0("https://content.dropboxapi.com/2/files/download")
+  url <- "https://content.dropboxapi.com/2/files/download"
   res <- httr::POST(url,
                     httr::add_headers("Authorization" = paste("Bearer", Sys.getenv("DROPBOX_TOKEN")),
                                       "Dropbox-API-Arg" = paste0("{\"path\": \"", dropbox_path, "\"}")),
@@ -44,7 +44,7 @@ dropbox_download <- function(dropbox_path, local_path) {
 
 # Function to upload a file to Dropbox
 dropbox_upload <- function(local_path, dropbox_path) {
-  url <- paste0("https://content.dropboxapi.com/2/files/upload")
+  url <- "https://content.dropboxapi.com/2/files/upload"
   res <- httr::POST(url,
                     httr::add_headers("Authorization" = paste("Bearer", Sys.getenv("DROPBOX_TOKEN")),
                                       "Dropbox-API-Arg" = paste0("{\"path\": \"", dropbox_path, "\", \"mode\": \"overwrite\"}"),
