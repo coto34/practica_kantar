@@ -49,8 +49,4 @@ if __name__ == '__main__':
     process_data(file_path)
 
 
-    # Process the data
-    process_data(file_path)
-
-
 
